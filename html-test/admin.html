@@ -1,0 +1,81 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .blog-item {
+      margin-bottom: 20px;
+    }
+
+    .blog-item a {
+      text-decoration: none;
+    }
+
+    .blog-item .blog-title {
+      font-size: 18px;
+    }
+
+    .blog-item .blog-info {
+      font-size: 14px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>
+    欢迎，<span id="realname"></span>
+  </h1>
+  <div class="content">
+    <h3>博客列表</h3>
+    <ul id="blogList-wrap"></ul>
+    <br>
+    <br>
+    <br>
+    <button id="toNewHtml">新建博客</button>
+  </div>
+  <script src="js/util.js"></script>
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+    function parseBlogList(blogList) {
+      blogList.forEach(item => {
+        var title = item.title,
+          content = item.content,
+          author = item.author,
+          date = utils.getDate(item.createTime);
+        var li = '<li class="blog-item">' +
+          '<a href="/detail.html?id=' + item.id + '">' +
+          '<div class="blog-title">' + title + '</div>' +
+          '<div class="blog-info"><span>' + author + '</span><span>' + date + '</span></div>' +
+          '</a>' +
+          '</li>';
+        $('#blogList-wrap').append($(li));
+      });
+    }
+    $(function () {
+      $('#toNewHtml').on('click', function () {
+        location.href = '/new.html'
+      })
+      console.log(utils.getUrlParam('realname'));
+      $('#realname').text(utils.getUrlParam('realname'));
+      $.ajax({
+        url: '/api/blog/list',
+        type: 'GET',
+        data: {
+          author: utils.getUrlParam('username'),
+          keyword: ''
+        },
+        success: function (res) {
+          console.log(res.data);
+          parseBlogList(res.data);
+        }
+      })
+    })
+  </script>
+</body>
+
+</html>

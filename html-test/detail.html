@@ -1,0 +1,77 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/common.css">
+
+  <style>
+    .title {
+      text-align: center;
+    }
+
+    .blog-item .blog-title {
+      font-size: 18px;
+    }
+
+    .blog-item .blog-info {
+      font-size: 14px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <h3 class="title" id="blogTitle"></h3>
+    <div class="blog-item">
+      <div class="blog-info"><span id='author'></span><span id="date"></span></div>
+    </div>
+    <div class="blog-content" id="blog-content">
+    </div>
+    <a href="" id="toUpdate">修改</a>
+    <a href="javascript:;" id="toDelete">删除</a>
+  </div>
+  <script src="js/util.js"></script>
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+    $(function () {
+      $.ajax({
+        url: '/api/blog/detail',
+        type: 'GET',
+        data: {
+          id: utils.getUrlParam('id')
+        },
+        success: function (res) {
+          console.log(res.data);
+          var blog = res.data;
+          $('#blogTitle').text(blog.title)
+          $('#author').text(blog.author)
+          $('#date').text(utils.getDate(blog.createTime))
+          $('#blog-content').text(blog.content)
+          $('#toUpdate').attr('href', '/update.html?id=' + blog.id)
+        }
+      })
+      $('#toDelete').on('click', function () {
+        $.ajax({
+          url: '/api/blog/delete',
+          type: 'POST',
+          data: {
+            id: utils.getUrlParam('id')
+
+          },
+          success: function (res) {
+            if (res.result == 0) {
+              alert(res.message);
+              location.href = '/login.html'
+            }
+          }
+        })
+      })
+    })
+  </script>
+</body>
+
+</html>
