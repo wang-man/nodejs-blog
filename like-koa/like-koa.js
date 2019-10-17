@@ -7,7 +7,7 @@ function compose (middlewareList) {
       const fn = middlewareList[i];   // 这个fn就是app.use()里面的中间件函数
       console.log(fn)
       try {
-        return Promise.resolve(fn(ctx, dispatch.bind(null, i + 1)));  // 使用promise将fn包裹一次————因为app.use()括号中的fn并不一定是异步函数，根据洋葱模型，前一个中间件内部会使用await next()来执行下一个中间件，即这里的fn，所以这里将中间件fn包裹为promise函数，都不会出现问题了。
+        return Promise.resolve(fn(ctx, dispatch.bind(null, i + 1)));  // 使用promise将fn包裹一次————因为app.use()括号中的fn并不一定是异步函数，根据洋葱模型，前一个中间件内部会使用await next()来执行下一个中间件，即这里的fn，那么fn必定是一个promise函数。所以这里将fn包裹为promise函数再返回。
       } catch (error) {
         return Promise.reject(error);
       }
@@ -41,8 +41,9 @@ class LikeKoa {
     return ctx;
   }
 
+  // callback返回的就是createServer回调函数
   callback () {
-    const fn = compose(this.middlewareList);  // fn是一个内部将返回promise函数的函数
+    const fn = compose(this.middlewareList);  // fn是一个内部会返回promise函数的函数
     // 这里返回给httpServer，和原生node一样的
     return (req, res) => {
       const ctx = this.createContext(req, res)
